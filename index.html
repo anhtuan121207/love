@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mưa Trái Tim 3D</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a0b2e, #4b1a45);
+            font-family: 'Inter', sans-serif;
+            color: white;
+            /* Ngăn bôi đen chữ khi kéo thả */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Chữ luôn cố định ở giữa màn hình và không bị xoay */
+        h1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            z-index: 10;
+            text-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+            animation: pulse 2s infinite;
+            text-align: center;
+            pointer-events: none; /* Để có thể kéo thả không gian xuyên qua chữ */
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Không gian 3D */
+        #scene {
+            perspective: 1000px;
+            width: 100vw;
+            height: 100vh;
+            cursor: grab;
+        }
+
+        #scene:active {
+            cursor: grabbing;
+        }
+
+        #world {
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            /* Góc nhìn mặc định ban đầu */
+            transform: rotateX(0deg) rotateY(0deg);
+        }
+
+        /* Vùng chứa từng trái tim để định vị 3D */
+        .heart-wrapper {
+            position: absolute;
+            top: -10vh;
+            transform-style: preserve-3d;
+        }
+
+        /* Trái tim thực sự bên trong sẽ đảm nhiệm việc rơi */
+        .heart {
+            font-size: 24px;
+            animation: fall linear forwards, sway ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 10px rgba(255, 51, 102, 0.8));
+            /* Giúp các icon luôn hướng mặt về phía người dùng (billboard) một chút, hoặc để tự nhiên */
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(120vh); opacity: 0; }
+        }
+
+        @keyframes sway {
+            0% { margin-left: -20px; }
+            100% { margin-left: 20px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Chị phương anh hấp❤️</h1>
+
+    <!-- Không gian 3D bắt sự kiện kéo chuột -->
+    <div id="scene">
+        <div id="world">
+            <!-- Trái tim sẽ được sinh ra ở đây -->
+        </div>
+    </div>
+
+    <script>
+        const world = document.getElementById('world');
+
+        // ==== LOGIC TẠO TRÁI TIM RƠI TRONG KHÔNG GIAN 3D ====
+        function createHeart() {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('heart-wrapper');
+            
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+
+            // Các biểu tượng trái tim và chữ
+            const elements = [
+                '❤️', '💖', '💗', '💓', '💕', '🤍', '🤍', 
+                'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp'
+            ];
+            const randomElement = elements[Math.floor(Math.random() * elements.length)];
+            heart.innerText = randomElement;
+
+            // Tùy chỉnh font cho chữ
+            if (randomElement.length > 2) {
+                heart.style.fontFamily = "'Playfair Display', serif";
+                heart.style.fontWeight = "bold";
+                heart.style.color = "#ff85a2";
+                heart.style.textShadow = "0 0 10px rgba(255, 102, 153, 0.8)";
+                heart.style.whiteSpace = "nowrap";
+            }
+
+            // Vị trí xuất hiện ngẫu nhiên trong khối 3D (Tọa độ X, Z)
+            const xPos = Math.random() * 100; // 0 đến 100vw
+            const zPos = (Math.random() * 1500) - 750; // -750px đến 750px tạo chiều sâu
+            
+            wrapper.style.left = xPos + 'vw';
+            wrapper.style.transform = `translateZ(${zPos}px)`;
+
+            // Kích thước và tốc độ rơi
+            const size = Math.random() * 30 + 10;
+            heart.style.fontSize = size + 'px';
+            
+            const fallDuration = Math.random() * 5 + 4; // 4s - 9s
+            heart.style.animationDuration = fallDuration + 's, 2s'; 
+
+            wrapper.appendChild(heart);
+            world.appendChild(wrapper);
+
+            // Dọn dẹp sau khi rơi
+            setTimeout(() => {
+                wrapper.remove();
+            }, fallDuration * 1000);
+        }
+
+        setInterval(createHeart, 30);
+
+        // ==== LOGIC KÉO CHUỘT ĐỂ XOAY 3D BẰNG TAY ====
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        // Lưu trữ góc xoay hiện tại
+        let currentRotation = { x: 0, y: 0 };
+
+        const scene = document.getElementById('scene');
+
+        // Khi nhấn chuột xuống
+        scene.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        // Khi nhả chuột ra
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Khi di chuyển chuột
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const deltaMove = {
+                x: e.clientX - previousMousePosition.x,
+                y: e.clientY - previousMousePosition.y
+            };
+
+            // Cập nhật góc xoay (Kéo ngang -> xoay Y, Kéo dọc -> xoay X)
+            currentRotation.y += deltaMove.x * 0.5;
+            currentRotation.x -= deltaMove.y * 0.5; // Trừ đi để kéo lên -> ngửa lên
+
+            world.style.transform = `rotateX(${currentRotation.x}deg) rotateY(${currentRotation.y}deg)`;
+
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        // Hỗ trợ cảm ứng trên điện thoại
+        scene.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        });
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const deltaMove = {
+                x: e.touches[0].clientX - previousMousePosition.x,
+                y: e.touches[0].clientY - previousMousePosition.y
+            };
+
+            currentRotation.y += deltaMove.x * 0.5;
+            currentRotation.x -= deltaMove.y * 0.5;
+
+            world.style.transform = `rotateX(${currentRotation.x}deg) rotateY(${currentRotation.y}deg)`;
+
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        });
+    </script>
+</body>
+</html>
