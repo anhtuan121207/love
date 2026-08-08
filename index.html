@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mưa Trái Tim 3D</title>
     <style>
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -31,15 +32,24 @@
             text-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
             animation: pulse 2s infinite;
             text-align: center;
-            pointer-events: none; /* Để có thể kéo thả không gian xuyên qua chữ */
+            pointer-events: none;
+            /* Để có thể kéo thả không gian xuyên qua chữ */
             margin: 0;
             white-space: nowrap;
         }
 
         @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.05); }
-            100% { transform: translate(-50%, -50%) scale(1); }
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
         }
 
         /* Không gian 3D */
@@ -78,20 +88,32 @@
         }
 
         @keyframes fall {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(120vh); opacity: 0; }
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(120vh);
+                opacity: 0;
+            }
         }
 
         @keyframes sway {
-            0% { margin-left: -20px; }
-            100% { margin-left: 20px; }
+            0% {
+                margin-left: -20px;
+            }
+
+            100% {
+                margin-left: 20px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <h1>Chị phương anh hấp❤️</h1>
+
 
     <!-- Không gian 3D bắt sự kiện kéo chuột -->
     <div id="scene">
@@ -107,13 +129,13 @@
         function createHeart() {
             const wrapper = document.createElement('div');
             wrapper.classList.add('heart-wrapper');
-            
+
             const heart = document.createElement('div');
             heart.classList.add('heart');
 
             // Các biểu tượng trái tim và chữ
             const elements = [
-                '❤️', '💖', '💗', '💓', '💕', '🤍', '🤍', 
+                '❤️', '💖', '💗', '💓', '💕', '🤍', '🤍',
                 'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp'
             ];
             const randomElement = elements[Math.floor(Math.random() * elements.length)];
@@ -131,16 +153,16 @@
             // Vị trí xuất hiện ngẫu nhiên trong khối 3D (Tọa độ X, Z)
             const xPos = Math.random() * 100; // 0 đến 100vw
             const zPos = (Math.random() * 1500) - 750; // -750px đến 750px tạo chiều sâu
-            
+
             wrapper.style.left = xPos + 'vw';
             wrapper.style.transform = `translateZ(${zPos}px)`;
 
             // Kích thước và tốc độ rơi
             const size = Math.random() * 30 + 10;
             heart.style.fontSize = size + 'px';
-            
+
             const fallDuration = Math.random() * 5 + 4; // 4s - 9s
-            heart.style.animationDuration = fallDuration + 's, 2s'; 
+            heart.style.animationDuration = fallDuration + 's, 2s';
 
             wrapper.appendChild(heart);
             world.appendChild(wrapper);
@@ -202,7 +224,7 @@
 
         window.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
-            
+
             const deltaMove = {
                 x: e.touches[0].clientX - previousMousePosition.x,
                 y: e.touches[0].clientY - previousMousePosition.y
@@ -221,23 +243,24 @@
             const elem = document.documentElement;
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (elem.requestFullscreen) {
-                    elem.requestFullscreen().catch(err => {});
+                    elem.requestFullscreen().catch(err => { });
                 } else if (elem.webkitRequestFullscreen) { /* Safari */
                     elem.webkitRequestFullscreen();
                 }
-                
+
                 // Thử khóa màn hình nằm ngang (chỉ hoạt động trên mobile khi đã full screen)
                 try {
                     if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock("landscape").catch(err => {});
+                        screen.orientation.lock("landscape").catch(err => { });
                     }
-                } catch (e) {}
+                } catch (e) { }
             }
         }
 
         // Kích hoạt khi người dùng click hoặc chạm vào màn hình lần đầu
         document.body.addEventListener('click', enterFullscreen);
-        document.body.addEventListener('touchstart', enterFullscreen, {passive: true});
+        document.body.addEventListener('touchstart', enterFullscreen, { passive: true });
     </script>
 </body>
+
 </html>
