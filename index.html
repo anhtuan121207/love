@@ -215,6 +215,29 @@
 
             previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         });
+
+        // ==== TỰ ĐỘNG FULL MÀN HÌNH & XOAY NGANG KHI CHẠM (CHO MOBILE) ====
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().catch(err => {});
+                } else if (elem.webkitRequestFullscreen) { /* Safari */
+                    elem.webkitRequestFullscreen();
+                }
+                
+                // Thử khóa màn hình nằm ngang (chỉ hoạt động trên mobile khi đã full screen)
+                try {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock("landscape").catch(err => {});
+                    }
+                } catch (e) {}
+            }
+        }
+
+        // Kích hoạt khi người dùng click hoặc chạm vào màn hình lần đầu
+        document.body.addEventListener('click', enterFullscreen);
+        document.body.addEventListener('touchstart', enterFullscreen, {passive: true});
     </script>
 </body>
 </html>
