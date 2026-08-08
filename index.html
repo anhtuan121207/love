@@ -108,10 +108,48 @@
                 margin-left: 20px;
             }
         }
+
+        /* Yêu cầu xoay ngang trên mobile */
+        #rotate-prompt {
+            display: none;
+        }
+
+        @media screen and (orientation: portrait) and (max-width: 768px) {
+            #rotate-prompt {
+                display: flex;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: linear-gradient(135deg, #1a0b2e, #4b1a45);
+                z-index: 9999;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                color: white;
+                font-size: 1.5rem;
+                text-align: center;
+                padding: 20px;
+            }
+            #rotate-prompt span {
+                font-size: 3rem;
+                margin-bottom: 20px;
+                animation: rotatePhone 2s ease-in-out infinite;
+            }
+        }
+
+        @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
     </style>
 </head>
 
 <body>
+
+    <div id="rotate-prompt">
+        <span>📱</span>
+        Vui lòng xoay ngang điện thoại để xem được 3D đẹp nhất nhé!
+    </div>
 
 
 
