@@ -146,6 +146,11 @@
 
 <body>
 
+    <!-- Nhạc nền -->
+    <audio id="bg-music">
+        <source src="Y2Mate.is - NI NY C ANH _ OFFICIAL MUSIC VIDEO _ SN TNG M-TP.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="rotate-prompt">
         <span>📱</span>
         Vui lòng xoay ngang điện thoại để xem được 3D đẹp nhất nhé!
@@ -162,6 +167,13 @@
 
     <script>
         const world = document.getElementById('world');
+        const bgMusic = document.getElementById('bg-music');
+        
+        // Khi nhạc kết thúc thì lặp lại từ giây thứ 10 thay vì từ đầu
+        bgMusic.addEventListener('ended', function() {
+            this.currentTime = 10;
+            this.play();
+        });
 
         // ==== LOGIC TẠO TRÁI TIM RƠI TRONG KHÔNG GIAN 3D ====
         function createHeart() {
@@ -174,7 +186,8 @@
             // Các biểu tượng trái tim và chữ
             const elements = [
                 '❤️', '💖', '💗', '💓', '💕', '🤍', '🤍',
-                'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp', 'chị phanh hấp'
+                'anh yêu em', 'anh yêu em', 'anh yêu em', 'anh yêu em', 'anh yêu em', 'anh yêu em',
+                'i love you', 'i love you', 'i love you'
             ];
             const randomElement = elements[Math.floor(Math.random() * elements.length)];
             heart.innerText = randomElement;
@@ -205,13 +218,16 @@
             wrapper.appendChild(heart);
             world.appendChild(wrapper);
 
-            // Dọn dẹp sau khi rơi
-            setTimeout(() => {
-                wrapper.remove();
-            }, fallDuration * 1000);
+            // Dọn dẹp sau khi rơi bằng sự kiện animationend để chính xác 100%, tránh bị mất đột ngột
+            heart.addEventListener('animationend', (e) => {
+                if (e.animationName === 'fall') {
+                    wrapper.remove();
+                }
+            });
         }
 
-        setInterval(createHeart, 30);
+        // Giảm giãn cách xuống 50ms để tạo ra nhiều trái tim và chữ hơn
+        setInterval(createHeart, 50);
 
         // ==== LOGIC KÉO CHUỘT ĐỂ XOAY 3D BẰNG TAY ====
         let isDragging = false;
@@ -276,9 +292,19 @@
             previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         });
 
-        // ==== TỰ ĐỘNG FULL MÀN HÌNH & XOAY NGANG KHI CHẠM (CHO MOBILE) ====
+        // ==== TỰ ĐỘNG FULL MÀN HÌNH, XOAY NGANG & PHÁT NHẠC KHI CHẠM (CHO MOBILE) ====
         function enterFullscreen() {
             const elem = document.documentElement;
+            
+            // Bật nhạc nền khi người dùng tương tác (nhấp/chạm)
+            if (bgMusic.paused) {
+                // Nếu là lần đầu phát (thời gian đang chưa tới 10s), thì tua nhanh qua 10s
+                if (bgMusic.currentTime < 10) {
+                    bgMusic.currentTime = 10; 
+                }
+                bgMusic.play().catch(err => console.log("Lỗi phát nhạc:", err));
+            }
+
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen().catch(err => { });
